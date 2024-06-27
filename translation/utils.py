@@ -436,7 +436,7 @@ class GoogleCloudTranslationClass(TranslationClass):
         config = speech.RecognitionConfig(
             encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=16000,
-            language_code="en-US",
+            language_code=input_language,
         )
 
         response = client.recognize(config=config, audio=audio)
@@ -452,9 +452,12 @@ class GoogleCloudTranslationClass(TranslationClass):
 
         synthesis_input = texttospeech.SynthesisInput(text=text)
 
+        #set the accent - Indian Standard
+        voice_name = language + "-IN-Standard-A"
+
         # Use a female voice
         voice = texttospeech.VoiceSelectionParams(
-            language_code=language, ssml_gender=texttospeech.SsmlVoiceGender.FEMALE
+            language_code=language, name=voice_name, ssml_gender=texttospeech.SsmlVoiceGender.FEMALE
         )
 
         audio_config = texttospeech.AudioConfig(
