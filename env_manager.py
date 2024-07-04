@@ -20,7 +20,8 @@ from llm.utils import (
                         BaseChatClient,
                         OpenAIChatClient,
                         AzureChatClient,
-                        OllamaChatClient
+                        OllamaChatClient,
+                        BedrockChatClient
                     )
 
 from vectorstores.utils import (
@@ -39,7 +40,8 @@ class EnvironmentManager():
                             "class": {
                                 "openai": OpenAIChatClient,
                                 "azure": AzureChatClient,
-                                "ollama": OllamaChatClient
+                                "ollama": OllamaChatClient,
+                                "bedrock": BedrockChatClient
                             },
                             "env_key": "LLM_TYPE"
                         },

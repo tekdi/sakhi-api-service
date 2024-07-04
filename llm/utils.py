@@ -1,10 +1,13 @@
+import os
 from abc import ABC, abstractmethod
 from typing import Any, Optional
-from langchain.chat_models.openai import ChatOpenAI
-from langchain.chat_models.azure_openai import AzureChatOpenAI
+
 from langchain.chat_models.base import BaseChatModel
-from langchain.chat_models.ollama import ChatOllama
-import os
+from langchain_aws import ChatBedrock
+from langchain_community.chat_models.azure_openai import AzureChatOpenAI
+from langchain_community.chat_models.ollama import ChatOllama
+from langchain_openai import ChatOpenAI
+
 
 class BaseChatClient(ABC):
     """
@@ -95,3 +98,32 @@ class OllamaChatClient(BaseChatClient):
             model=model,
             **kwargs
         )
+
+
+class BedrockChatClient(BaseChatClient):
+    """
+    This class provides a bedrock chat interface.
+    """
+
+    def get_client(
+        self,
+        model=os.getenv("BEDROCK_MODEL_ID"),
+        # credentials_profile_name=os.getenv("AWS_PROFILE"),
+        # use_messages_api=True,
+        **kwargs: Any,
+    ) -> ChatBedrock:
+        """
+        This method creates and returns a ChatBedrock instance.
+
+        Args:
+            model (str, optional): The Bedrock model to use. Defaults to the value of the environment variable "BEDROCK_MODEL_ID".
+            **kwargs: Additional arguments to be passed to the ChatBedrock constructor.
+
+        Returns:
+            An instance of the ChatBedrock class.
+        """
+        return ChatBedrock(
+            # credentials_profile_name=credentials_profile_name,
+            # provider="anthropic",
+            model_id=model,
+        )  # , **kwargs)

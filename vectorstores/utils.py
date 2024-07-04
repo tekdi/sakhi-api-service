@@ -10,7 +10,7 @@ from typing import (
 import os
 import marqo
 from langchain.docstore.document import Document
-from langchain.vectorstores.marqo import Marqo
+from langchain_community.vectorstores import Marqo
 
 class BaseVectorStore:
     """Base class for vector store implementations."""

@@ -10,7 +10,7 @@ import tiktoken
 from redis_util import read_messages_from_redis, store_messages_in_redis
 from dotenv import load_dotenv
 from langchain.docstore.document import Document
-from langchain.vectorstores.marqo import Marqo
+from langchain_community.vectorstores import Marqo
 from env_manager import ai_class, vectorstore_class
 from config_util import get_config_value
 from utils import convert_chat_messages
