@@ -1,16 +1,14 @@
 import ast
-from typing import (
-    Any,
-    List,
-    Tuple
-)
+from typing import Any, List, Tuple
+
 import tiktoken
 from dotenv import load_dotenv
 from langchain.docstore.document import Document
+
 from env_manager import llm_class, vectorstore_class
-from utils import convert_chat_messages, get_from_env_or_config
 from logger import logger
 from redis_util import read_messages_from_redis, store_messages_in_redis
+from utils import convert_chat_messages, get_from_env_or_config
 
 load_dotenv()
 temperature = float(get_from_env_or_config("llm", "temperature"))
