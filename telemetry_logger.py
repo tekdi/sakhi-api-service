@@ -1,6 +1,7 @@
 import time
 import uuid
 import os
+import json
 import requests
 from utils import get_from_env_or_config
 from logger import logger
@@ -139,6 +140,11 @@ class TelemetryLogger:
             {"duration": int(eventInput.get("duration"))}
         ]
         flattened_dict = self.__flatten_dict(eventInput.get("body", {}))
+        if bool(flattened_dict):
+            for item in flattened_dict.items():
+                eventEDataParams.append({item[0]: item[1]})
+
+        flattened_dict = self.__flatten_dict(json.loads(eventInput.get("response", {})))
         if bool(flattened_dict):
             for item in flattened_dict.items():
                 eventEDataParams.append({item[0]: item[1]})
