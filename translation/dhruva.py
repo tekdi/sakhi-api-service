@@ -86,10 +86,6 @@ class DhruvaTranslationClass(BaseTranslationClass):
                 "Content-Type": "application/json"
             }
 
-            print(url)
-            print(headers)
-            print(json.dumps(payload))
-
             response = requests.request("POST", url, headers=headers, data=json.dumps(payload))
             process_time = time.time() - start_time
             response.raise_for_status()
@@ -131,10 +127,6 @@ class DhruvaTranslationClass(BaseTranslationClass):
         }
 
         try:
-            print(url)
-            print(headers)
-            print(json.dumps(payload))
-
             response = requests.request("POST", url, headers=headers, data=json.dumps(payload))
             process_time = time.time() - start_time
             response.raise_for_status()
@@ -172,10 +164,6 @@ class DhruvaTranslationClass(BaseTranslationClass):
                 "Authorization": get_from_env_or_config("translator", "BHASHINI_API_KEY", None),
                 "Content-Type": "application/json"
             }
-
-            print(url)
-            print(headers)
-            print(json.dumps(payload))
 
             response = requests.request("POST", url, headers=headers, data=json.dumps(payload))
             process_time = time.time() - start_time
