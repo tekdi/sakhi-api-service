@@ -81,7 +81,7 @@ class TelemetryLogger:
             "eid": "LOG",
             "ets": int(time.time() * 1000),  # Current timestamp
             "ver": telemetry_ver,  # Version
-            "mid": f"LOG:{round(time.time())}",  # Unique message ID
+            "mid": f"LOG:{round(time.time())}--{str(uuid.uuid4())}",  # Unique message ID
             "actor": {
                 "id": actor_id,
                 "type": "System",

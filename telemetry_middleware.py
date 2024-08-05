@@ -1,5 +1,6 @@
 import time
 import json
+import uuid
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import Message
 from fastapi import Request
@@ -52,6 +53,10 @@ class TelemetryMiddleware(BaseHTTPMiddleware):
                 "method": request.method,
                 "url": request.url
             }
+
+            request_id = f"{int(time.time())}-{uuid.uuid4().hex}"
+            event["x-request-id"] = request_id
+
             event.update(request.headers)
             
             if isinstance(response, StreamingResponse):
