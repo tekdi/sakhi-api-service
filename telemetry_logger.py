@@ -144,10 +144,11 @@ class TelemetryLogger:
             for item in flattened_dict.items():
                 eventEDataParams.append({item[0]: item[1]})
 
-        flattened_dict = self.__flatten_dict(json.loads(eventInput.get("response", {})))
-        if bool(flattened_dict):
-            for item in flattened_dict.items():
-                eventEDataParams.append({item[0]: item[1]})
+        if eventInput.get("response", {}) != {}:
+            flattened_dict = self.__flatten_dict(json.loads(eventInput.get("response", {})))
+            if bool(flattened_dict):
+                for item in flattened_dict.items():
+                    eventEDataParams.append({item[0]: item[1]})
 
         return eventEDataParams
 
