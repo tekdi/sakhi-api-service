@@ -1,6 +1,7 @@
 import time
 import uuid
 import os
+import json
 import requests
 from utils import get_from_env_or_config
 from logger import logger
@@ -80,7 +81,7 @@ class TelemetryLogger:
             "eid": "LOG",
             "ets": int(time.time() * 1000),  # Current timestamp
             "ver": telemetry_ver,  # Version
-            "mid": f"LOG:{round(time.time())}",  # Unique message ID
+            "mid": f"LOG:{round(time.time())}--{str(uuid.uuid4())}",  # Unique message ID
             "actor": {
                 "id": actor_id,
                 "type": "System",
@@ -142,6 +143,12 @@ class TelemetryLogger:
         if bool(flattened_dict):
             for item in flattened_dict.items():
                 eventEDataParams.append({item[0]: item[1]})
+
+        if eventInput.get("response", {}) != {}:
+            flattened_dict = self.__flatten_dict(json.loads(eventInput.get("response", {})))
+            if bool(flattened_dict):
+                for item in flattened_dict.items():
+                    eventEDataParams.append({item[0]: item[1]})
 
         return eventEDataParams
 
