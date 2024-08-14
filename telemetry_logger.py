@@ -100,7 +100,6 @@ class TelemetryLogger:
                 },
                 "env": ENV_NAME,
                 "llm_type": LLM_TYPE,
-                "model_used": BEDROCK_MODEL_ID,
                 "translation_type": TRANSLATION_TYPE
 
             },
