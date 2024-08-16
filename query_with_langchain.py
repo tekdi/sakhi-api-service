@@ -1,3 +1,4 @@
+import os
 import ast
 from typing import Any, List, Tuple
 
@@ -11,9 +12,11 @@ from redis_util import read_messages_from_redis, store_messages_in_redis
 from utils import convert_chat_messages, get_from_env_or_config
 
 load_dotenv()
+
 temperature = float(get_from_env_or_config("llm", "temperature"))
 chatClient  = llm_class.get_client(temperature=temperature)
 max_messages = int(get_from_env_or_config("llm", "max_messages")) # Maximum number of messages to include in conversation history
+llm_type = os.getenv("LLM_TYPE")
 
 def querying_with_langchain_gpt3(index_id, query, context):
     intent_response = check_bot_intent(query, context)
@@ -37,19 +40,34 @@ def querying_with_langchain_gpt3(index_id, query, context):
         logger.info(f"Score filtered documents : {str(filtered_document)}")
         contexts = get_formatted_documents(filtered_document)
         if not documents or not contexts or not filtered_document:
-            return "I'm sorry, but I am not currently trained with relevant documents to provide a specific answer for your question.", None, 200
+            return "I'm sorry, but I am not currently trained with relevant documents to provide a specific answer for your question.", None, 200, 0, 0, 0
 
         system_rules = system_rules.format(contexts=contexts)
         logger.debug("==== System Rules ====")
         logger.debug(f"System Rules : {system_rules}")
-        response = call_chat_model(
+        answer = call_chat_model(
             messages=[
                 {"role": "system", "content": system_rules},
                 {"role": "user", "content": query}
             ]
         )
-        logger.info({"label": "llm_response", "response": response})
-        return response.strip(";"), None, 200
+        logger.info({"label": "llm_response", "response": answer.content})
+        
+        response = answer.content
+
+        if llm_type == "bedrock":
+            token_usage = answer.response_metadata["usage"]
+            input_tokens = token_usage["prompt_tokens"]
+            output_tokens = token_usage["completion_tokens"]
+            total_tokens = token_usage["total_tokens"]
+        elif llm_type == "openai":
+            token_usage = answer.response_metadata["token_usage"]
+            input_tokens = token_usage["prompt_tokens"]
+            output_tokens = token_usage["completion_tokens"]
+            total_tokens = token_usage["total_tokens"]
+
+        
+        return response.strip(";"), None, 200, input_tokens, output_tokens, total_tokens
     except Exception as e:
         error_message = str(e.__context__) + " and " + e.__str__()
         status_code = 500
@@ -107,7 +125,7 @@ def conversation_retrieval_chain(index_id, query, session_id, context):
 def call_chat_model(messages: List[dict]) -> str:
     converted_messsages = convert_chat_messages(messages)
     response = chatClient.invoke(input=converted_messsages)
-    return response.content
+    return response
 
 def format_assistant_message(a):
     """Formats the assistant message
