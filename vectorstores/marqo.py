@@ -8,7 +8,7 @@ from typing import (
 
 import marqo
 from langchain.docstore.document import Document
-from langchain_community.vectorstores import Marqo
+from langchain.vectorstores.marqo import Marqo
 
 from vectorstores.base import BaseVectorStore
 
@@ -22,15 +22,13 @@ class MarqoVectorStore(BaseVectorStore):
         self.collection_name = os.environ["VECTOR_COLLECTION_NAME"]
         self.embedding_model = os.environ["EMBEDDING_MODEL"]
         self.index_settings = {
-            "index_defaults": {
-                "treat_urls_and_pointers_as_images": False,
-                "model": self.embedding_model,
-                "normalize_embeddings": True,
-                "text_preprocessing": {
-                    "split_length": self.SPLIT_LENGTH,
-                    "split_overlap": self.SPLIT_OVERLAP,
-                    "split_method": "sentence"
-                }
+            "treatUrlsAndPointersAsImages": False,
+            "model": self.embedding_model,
+            "normalizeEmbeddings": True,
+            "textPreprocessing": {
+                "splitLength": self.SPLIT_LENGTH,
+                "splitOverlap": self.SPLIT_OVERLAP,
+                "splitMethod": "passage"
             }
         }
 
@@ -84,6 +82,27 @@ class MarqoVectorStore(BaseVectorStore):
         return ids
 
     def similarity_search_with_score(self, query: str, collection_name: str, k: int = 20) -> List[Tuple[Document, float]]:
-        docsearch = Marqo(self.client, index_name=collection_name, searchable_attributes=["text"])
-        documents = docsearch.similarity_search_with_score(query, k)
-        return documents
+        try:
+            docsearch = Marqo(self.client, index_name=collection_name)
+            documents = docsearch.similarity_search_with_score(query, k)
+            return documents
+        except Exception as e:
+            return []
+    
+    def cache_documents(self, documents: List[Dict[str, str]], collection_name:str) -> str:
+        try:
+            self.client.create_index(collection_name, settings_dict=self.index_settings)
+        except Exception as e:
+            pass
+
+        response = self.client.index(collection_name).add_documents(documents=documents,
+                                                         tensor_fields=self.TENSOR_FIELDS)
+        if response["errors"]:
+            err_msg = (
+                f"Error in uploading cache in index range {collection_name}"
+                f"check Marqo logs."
+            )
+            raise RuntimeError(err_msg)
+        ids = []
+        ids += [item["_id"] for item in response["items"]]
+        return ids
