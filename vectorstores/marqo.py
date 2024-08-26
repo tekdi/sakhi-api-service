@@ -90,6 +90,19 @@ class MarqoVectorStore(BaseVectorStore):
             return []
     
     def cache_documents(self, documents: List[Dict[str, str]], collection_name:str) -> str:
+        """
+        Caches documents into the specified Marqo collection. Creates the collection if it doesn't exist.
+
+        Args:
+            documents (List[Dict[str, str]]): List of documents with "text" and optional "metadata".
+            collection_name (str): The target collection name.
+
+        Returns:
+            str: List of document IDs that were successfully cached.
+
+        Raises:
+            RuntimeError: If document upload fails.
+        """
         try:
             self.client.create_index(collection_name, settings_dict=self.index_settings)
         except Exception as e:
