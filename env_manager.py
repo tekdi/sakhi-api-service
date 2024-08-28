@@ -52,7 +52,7 @@ class EnvironmentManager():
             }
         }
 
-    def create_instance(self, env_key):
+    def create_instance(self, env_key, *args, **kwargs):
         env_var = self.indexes[env_key]["env_key"]
         type_value = os.getenv(env_var)
 
@@ -62,13 +62,13 @@ class EnvironmentManager():
             )
 
         logger.info(f"Init {env_key} class for: {type_value}")
-        return self.indexes[env_key]["class"].get(type_value)()
-            
+        return self.indexes[env_key]["class"].get(type_value)(*args, **kwargs)
+
 env_class = EnvironmentManager()
 
-# create instances of functions
+# Create instances of functions with required parameters
 logger.info(f"Initializing required classes for components")
 llm_class: BaseChatClient = env_class.create_instance("llm")
 translate_class: BaseTranslationClass = env_class.create_instance("translate")
 storage_class: BaseStorageClass = env_class.create_instance("storage")
-vectorstore_class: BaseVectorStore = env_class.create_instance("vectorstore")
+vectorstore_class: BaseVectorStore = env_class.create_instance("vectorstore", index_name="default_index")
