@@ -13,7 +13,6 @@ ENV_NAME = os.getenv('SERVICE_ENVIRONMENT')
 TELEMETRY_LOG_ENABLED = get_from_env_or_config('telemetry', 'telemetry_log_enabled', None).lower() == "true"
 LLM_TYPE=os.getenv("LLM_TYPE")
 TRANSLATION_TYPE=os.getenv("TRANSLATION_TYPE")
-BEDROCK_MODEL_ID=os.getenv("BEDROCK_MODEL_ID")
 telemetry_id = get_from_env_or_config('telemetry', 'service_id', None)
 telemetry_ver = get_from_env_or_config('telemetry', 'service_ver', None)
 actor_id = get_from_env_or_config('telemetry', 'actor_id', None)
