@@ -4,8 +4,7 @@ from typing import List
 from langchain.docstore.document import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from llama_index import SimpleDirectoryReader
-from vectorstores.marqo import MarqoVectorStore 
-
+from env_manager import vectorstore_class
 
 def document_loader(input_dir: str) -> List[Document]:
     """Load data from the input directory.
@@ -93,8 +92,7 @@ def indexer_main():
     print("Total documents :: =>", len(documents))
     
     print("Adding documents...")
-    vector_store = MarqoVectorStore(index_name=INDEX_NAME)
-    results = vector_store.add_documents(documents, FRESH_INDEX)
+    results = vectorstore_class.add_documents(documents, FRESH_INDEX)
     print("results =======>", results)
     
     print("============ INDEX DONE =============")
@@ -102,7 +100,7 @@ def indexer_main():
 
 if __name__ == "__main__":
     indexer_main()
-    
+
 # For Fresh collection
 # python3 index_documents.py --folder_path=Documents --fresh_index
 
