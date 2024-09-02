@@ -4,7 +4,11 @@ from typing import List
 from langchain.docstore.document import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from llama_index import SimpleDirectoryReader
-from env_manager import vectorstore_class
+from env_manager import vectorstore_class 
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 def document_loader(input_dir: str) -> List[Document]:
     """Load data from the input directory.
@@ -92,11 +96,12 @@ def indexer_main():
     print("Total documents :: =>", len(documents))
     
     print("Adding documents...")
-    results = vectorstore_class.add_documents(documents, FRESH_INDEX)
+
+    vector_store = vectorstore_class(index_name=INDEX_NAME)
+    results = vector_store.add_documents(documents, FRESH_INDEX)
     print("results =======>", results)
     
     print("============ INDEX DONE =============")
-
 
 if __name__ == "__main__":
     indexer_main()

@@ -1,16 +1,14 @@
 import os
-
 from dotenv import load_dotenv
+from logger import logger
 
 from llm import (AzureChatClient, BaseChatClient, BedrockChatClient,
                  OllamaChatClient, OpenAIChatClient)
-from logger import logger
 from storage import (AwsS3BucketClass, BaseStorageClass, GcpBucketClass,
                      OciBucketClass)
 from translation import (BaseTranslationClass, BhashiniTranslationClass,
                          DhruvaTranslationClass, GoogleCloudTranslationClass)
 from vectorstores import BaseVectorStore, MarqoVectorStore
-
 
 class EnvironmentManager():
     """
@@ -52,7 +50,7 @@ class EnvironmentManager():
             }
         }
 
-    def create_instance(self, env_key, *args, **kwargs):
+    def create_instance(self, env_key):
         env_var = self.indexes[env_key]["env_key"]
         type_value = os.getenv(env_var)
 
@@ -62,13 +60,13 @@ class EnvironmentManager():
             )
 
         logger.info(f"Init {env_key} class for: {type_value}")
-        return self.indexes[env_key]["class"].get(type_value)(*args, **kwargs)
+        return self.indexes[env_key]["class"].get(type_value)
 
 env_class = EnvironmentManager()
 
-# Create instances of functions with required parameters
+# create instances of functions
 logger.info(f"Initializing required classes for components")
 llm_class: BaseChatClient = env_class.create_instance("llm")
 translate_class: BaseTranslationClass = env_class.create_instance("translate")
 storage_class: BaseStorageClass = env_class.create_instance("storage")
-vectorstore_class: MarqoVectorStore = env_class.create_instance("vectorstore", index_name="default_index")
+vectorstore_class: BaseVectorStore = env_class.create_instance("vectorstore")
