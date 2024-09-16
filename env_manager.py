@@ -1,14 +1,16 @@
 import os
+
 from dotenv import load_dotenv
-from logger import logger
 
 from llm import (AzureChatClient, BaseChatClient, BedrockChatClient,
                  OllamaChatClient, OpenAIChatClient)
+from logger import logger
 from storage import (AwsS3BucketClass, BaseStorageClass, GcpBucketClass,
                      OciBucketClass)
 from translation import (BaseTranslationClass, BhashiniTranslationClass,
                          DhruvaTranslationClass, GoogleCloudTranslationClass)
 from vectorstores import BaseVectorStore, MarqoVectorStore
+
 
 class EnvironmentManager():
     """
@@ -60,8 +62,8 @@ class EnvironmentManager():
             )
 
         logger.info(f"Init {env_key} class for: {type_value}")
-        return self.indexes[env_key]["class"].get(type_value)
-
+        return self.indexes[env_key]["class"].get(type_value)()
+            
 env_class = EnvironmentManager()
 
 # create instances of functions

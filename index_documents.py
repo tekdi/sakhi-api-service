@@ -1,15 +1,12 @@
 import argparse
-import re
-from typing import List
+from typing import (
+    List
+)
 from langchain.docstore.document import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from llama_index import SimpleDirectoryReader
-from env_manager import vectorstore_class 
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
-
+from env_manager import vectorstore_class
+ 
 def document_loader(input_dir: str) -> List[Document]:
     """Load data from the input directory.
 
@@ -20,9 +17,9 @@ def document_loader(input_dir: str) -> List[Document]:
         List[Document]: A list of documents.
     """
     return SimpleDirectoryReader(
-        input_dir=input_dir, recursive=True).load_data()
-
-def split_documents(documents: List[Document], chunk_size: int = 4000, chunk_overlap=200) -> List[Document]:
+        input_dir=input_dir, recursive=True).load_data() # show_progress=True 
+ 
+def split_documents(documents: List[Document], chunk_size: int = 4000, chunk_overlap = 200) -> List[Document]:
     """Split documents.
 
     Args:
@@ -35,19 +32,20 @@ def split_documents(documents: List[Document], chunk_size: int = 4000, chunk_ove
     """
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size, chunk_overlap=chunk_overlap)
-
-    # Pattern to remove unsupported hexadecimal characters for Marqo.
-    pattern = re.compile(r'[\x00-\x1F\x7F\u00A0]')
+    # splited_docs = text_splitter.split_documents(documents)
     splited_docs = []
     for document in documents:
         for chunk in text_splitter.split_text(document.text):
-            chunk = re.sub(pattern, '', chunk)
             splited_docs.append(Document(page_content=chunk, metadata={
                 "page_label": document.metadata.get("page_label"),
                 "file_name": document.metadata.get("file_name"),
+                "file_path": document.metadata.get("file_path"),
                 "file_type": document.metadata.get("file_type")
             }))
     return splited_docs
+
+def transform_documents():
+    pass
 
 def load_documents(folder_path: str, chunk_size: int, chunk_overlap: int) -> List[Document]:
     documents = document_loader(folder_path)
@@ -71,17 +69,12 @@ def indexer_main():
     parser.add_argument('--chunk_overlap',
                         type=int,
                         required=False,
-                        help='documents chunk overlap size',
+                        help='documents chunk size',
                         default=200
                         )
     parser.add_argument('--fresh_index',
                         action='store_true',
                         help='Is the indexing fresh'
-                        )
-    parser.add_argument('--index_name',
-                        type=str,
-                        required=True,
-                        help='Name of the vector collection'
                         )
 
     args = parser.parse_args()
@@ -90,22 +83,20 @@ def indexer_main():
     FRESH_INDEX = args.fresh_index
     CHUNK_SIZE = args.chunk_size
     CHUNK_OVERLAP = args.chunk_overlap
-    INDEX_NAME = args.index_name
 
     documents = load_documents(FOLDER_PATH, CHUNK_SIZE, CHUNK_OVERLAP)
     print("Total documents :: =>", len(documents))
     
     print("Adding documents...")
-
-    vector_store = vectorstore_class(index_name=INDEX_NAME)
-    results = vector_store.add_documents(documents, FRESH_INDEX)
+    results = vectorstore_class.add_documents(documents, FRESH_INDEX)
     print("results =======>", results)
     
     print("============ INDEX DONE =============")
 
+
 if __name__ == "__main__":
     indexer_main()
-
+    
 # For Fresh collection
 # python3 index_documents.py --folder_path=Documents --fresh_index
 
