@@ -1,6 +1,8 @@
 transformers==4.36.0
 starlette==0.27.0
 setuptools==65.5.1
+openai-whisper
+whisper
 numpy==1.26.4
 urllib3==1.26.18
 pydantic==1.10.13
