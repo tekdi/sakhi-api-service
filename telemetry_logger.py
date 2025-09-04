@@ -152,6 +152,8 @@ class TelemetryLogger:
                 eventEDataParams.append({item[0]: item[1]})
 
         response = eventInput.get("response", {})
+
+        # Modified this to handle OPTIONS Request
         if response != {}:
             if isinstance(response, str):
                 try:
